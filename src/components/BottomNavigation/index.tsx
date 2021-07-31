@@ -1,23 +1,31 @@
 import React from 'react';
+import { useNavigation } from '@react-navigation/native';
 import { Text, View } from "react-native";
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/Feather';
 import { theme } from '../../global/styles/theme';
+import { BottomNavigationButton } from '../BottomNavigationButton';
 
 interface BottomNavigationProps {
   active: string;
 }
 
 export function BottomNavigation({ active }: BottomNavigationProps) {
+  const navigation = useNavigation();
+
+  function natigateTo(screen: string) {
+    navigation.navigate(screen);
+  }
+
   return (
     <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' }}>
 
-      <TouchableOpacity>
-        <View style={{ padding: 10, alignItems: 'center', width: 80, borderTopColor: theme.palette.primary, borderTopWidth: 2 }}>
-          <Icon name="home" size={20} color={theme.palette.primary}></Icon>
-          <Text style={{ color: theme.palette.primary }}>Início</Text>
-        </View>
-      </TouchableOpacity>
+      <BottomNavigationButton
+        to="Home"
+        icon="home"
+        label="Início"
+        active={active === "Home"}
+      />
 
       <TouchableOpacity activeOpacity={0.7}>
         <View style={{ alignItems: 'center', width: 80 }}>
@@ -27,12 +35,12 @@ export function BottomNavigation({ active }: BottomNavigationProps) {
         </View>
       </TouchableOpacity>
 
-      <TouchableOpacity activeOpacity={0.7}>
-        <View style={{ padding: 10, alignItems: 'center', width: 80 }}>
-          <Icon name="star" size={20}></Icon>
-          <Text>Favoritas</Text>
-        </View>
-      </TouchableOpacity>
+      <BottomNavigationButton
+        to="Favorites"
+        icon="star"
+        label="Favoritos"
+        active={active === "Favorites"}
+      />
 
     </View>
   )
