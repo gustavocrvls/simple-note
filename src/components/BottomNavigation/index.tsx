@@ -27,7 +27,7 @@ export function BottomNavigation({ active }: BottomNavigationProps) {
         active={active === "Home"}
       />
 
-      <TouchableOpacity activeOpacity={0.7}>
+      <TouchableOpacity activeOpacity={0.7} onPress={() => natigateTo('Note')}>
         <View style={{ alignItems: 'center', width: 80 }}>
           <View style={{ backgroundColor: theme.palette.primary, borderRadius: 12, padding: 2 }}>
             <Icon name="plus" size={40} color="#fff"></Icon>

@@ -5,6 +5,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 import { Home } from "../screens/Home";
 import { Favorites } from '../screens/Favorites';
+import { Note } from '../screens/Note';
 
 const { Navigator, Screen } = createStackNavigator();
 
@@ -26,6 +27,10 @@ export function Routes() {
         <Screen
           name="Favorites"
           component={Favorites}
+        />
+        <Screen
+          name="Note"
+          component={Note}
         />
       </Navigator>
     </NavigationContainer>

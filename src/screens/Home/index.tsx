@@ -1,3 +1,4 @@
+import { useIsFocused } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import { Text, View } from "react-native";
 import { FlatList } from 'react-native-gesture-handler';
@@ -15,6 +16,7 @@ type Note = {
 
 export function Home() {
   const [notes, setNotes] = useState<Note[]>([]);
+  const isFocused = useIsFocused();
 
   useEffect(() => {
     db.transaction((tx) => {
@@ -24,14 +26,13 @@ export function Home() {
     });
 
     db.transaction((tx) => {
-      tx.executeSql("insert into notes (title, content, is_starred) values (?, ?, ?)", ['Teste', 'teste teste', false])
-
       tx.executeSql("select * from notes", [], (_, { rows: { _array } }: any) => {
         setNotes(_array)
+        console.error(_array)
       }
       );
     })
-  }, []);
+  }, [isFocused]);
 
   return (
     <View style={styles.container}>
