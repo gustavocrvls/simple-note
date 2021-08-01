@@ -1,6 +1,5 @@
-import knex from 'knex';
-import config from '../../knexfile';
+import * as SQLite from 'expo-sqlite';
 
-const db = knex(config.development)
+const db = SQLite.openDatabase('db.db');
 
 export { db }

@@ -8,13 +8,14 @@ export const styles = StyleSheet.create({
     backgroundColor: theme.palette.light.card.bg,
     borderRadius: 10,
     padding: 10,
-    flexDirection: 'row'
+    flexDirection: 'row',
+    marginBottom: 10
   },
   cardContent: {
     flex: 1
   },
   cardTitle: {
-    fontSize: 18
+    fontSize: 18,
   },
   cardSubtitle: {
     fontSize: 16,
