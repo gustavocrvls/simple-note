@@ -22,7 +22,7 @@ export function Favorites() {
     if (!isFocused) return
 
     db.transaction((tx) => {
-      tx.executeSql("select * from notes where is_starred = true", [], (_, { rows: { _array } }: any) => {
+      tx.executeSql("select * from notes where is_starred = ?", [true], (_, { rows: { _array } }: any) => {
         setNotes(_array)
       });
     })
