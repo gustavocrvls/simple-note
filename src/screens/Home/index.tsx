@@ -19,6 +19,8 @@ export function Home() {
   const isFocused = useIsFocused();
 
   useEffect(() => {
+    // if (!isFocused) return
+
     db.transaction((tx) => {
       tx.executeSql(
         "create table if not exists notes (id integer primary key not null, title text, content text, is_starred boolean);"
@@ -28,7 +30,6 @@ export function Home() {
     db.transaction((tx) => {
       tx.executeSql("select * from notes", [], (_, { rows: { _array } }: any) => {
         setNotes(_array)
-        console.error(_array)
       }
       );
     })
@@ -43,7 +44,14 @@ export function Home() {
         <FlatList
           data={notes}
           keyExtractor={(item) => String(item.id)}
-          renderItem={({ item }) => <NoteCard title={item.title} subtitle={item.content} />}
+          renderItem={({ item }) =>
+            <NoteCard
+              id={String(item.id)}
+              title={item.title}
+              subtitle={item.content}
+              isStarred={item.is_starred}
+            />
+          }
         />
       </View>
       <BottomNavigation active="Home" />

@@ -1,3 +1,4 @@
+import { useIsFocused } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import { Text, View } from "react-native";
 import { FlatList } from 'react-native-gesture-handler';
@@ -15,14 +16,17 @@ type Note = {
 
 export function Favorites() {
   const [notes, setNotes] = useState<Note[]>([]);
+  const isFocused = useIsFocused();
 
   useEffect(() => {
+    if (!isFocused) return
+
     db.transaction((tx) => {
       tx.executeSql("select * from notes where is_starred = true", [], (_, { rows: { _array } }: any) => {
         setNotes(_array)
       });
     })
-  }, [])
+  }, [isFocused])
 
   return (
     <View style={styles.container}>
@@ -33,7 +37,7 @@ export function Favorites() {
         <FlatList
           data={notes}
           keyExtractor={(item) => String(item.id)}
-          renderItem={({ item }) => <NoteCard title={item.title} subtitle={item.content} />}
+          renderItem={({ item }) => <NoteCard id={String(item.id)} title={item.title} subtitle={item.content} isStarred={item.is_starred} />}
         />
       </View>
       <BottomNavigation active="Favorites" />
