@@ -19,7 +19,7 @@ export function Home() {
   const isFocused = useIsFocused();
 
   useEffect(() => {
-    // if (!isFocused) return
+    if (!isFocused) return
 
     db.transaction((tx) => {
       tx.executeSql(
