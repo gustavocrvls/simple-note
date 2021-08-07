@@ -1,6 +1,6 @@
 import { RouteProp, useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
-import { View, TextInput, TouchableOpacity, BackHandler, } from "react-native";
+import { View, TextInput, TouchableOpacity, Alert } from "react-native";
 import Icon from "react-native-vector-icons/AntDesign";
 import { db } from "../../database/connection";
 import { theme } from "../../global/styles/theme";
@@ -28,48 +28,57 @@ export function Note({ route }: Props) {
     content: '',
     is_starred: false
   } as Note);
+  const [hasChanges, setHasChanges] = useState(false);
   const { params } = route;
   const id = params?.id;
   const navigation = useNavigation();
 
   function deleteNote() {
-    db.transaction((tx) => {
-      tx.executeSql(
-        "DELETE FROM notes where id = ?",
-        [id]
-      );
-    });
-    navigation.goBack();
+    Alert.alert(
+      "Deseja apagar a nota?",
+      "Essa ação não pode ser desfeita!",
+      [
+        {
+          text: "Cancelar",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel"
+        },
+        {
+          text: "OK", onPress: () => {
+            db.transaction((tx) => {
+              tx.executeSql(
+                "DELETE FROM notes where id = ?",
+                [id]
+              );
+            });
+            navigation.goBack();
+          }
+        }
+      ]
+    );
   }
 
-  useEffect(() => {
-    const backHandler = BackHandler.addEventListener(
-      "hardwareBackPress",
-      () => {
-        if (!id) {
-          db.transaction((tx) => {
-            if (note.title && note.content)
-              tx.executeSql(
-                "insert into notes (title, content, is_starred) values (?, ?, ?)",
-                [note.title, note.content, note.is_starred]
-              )
-          })
-        } else {
-          db.transaction((tx) => {
-            if (note.title && note.content)
-              tx.executeSql(
-                "update notes set title = ?, content = ?, is_starred = ? where id = ?",
-                [note.title, note.content, note.is_starred, id]
-              )
-          })
-        }
-
-        return false
-      }
-    );
-
-    return () => backHandler.remove();
-  }, [note]);
+  function handleSave() {
+    if (!id) {
+      db.transaction((tx) => {
+        if (note.title && note.content)
+          tx.executeSql(
+            "insert into notes (title, content, is_starred) values (?, ?, ?)",
+            [note.title, note.content, note.is_starred]
+          )
+      })
+      navigation.goBack();
+    } else {
+      db.transaction((tx) => {
+        if (note.title && note.content)
+          tx.executeSql(
+            "update notes set title = ?, content = ?, is_starred = ? where id = ?",
+            [note.title, note.content, note.is_starred, id]
+          )
+      })
+    }
+    setHasChanges(false);
+  }
 
   useEffect(() => {
     if (!id) return
@@ -89,7 +98,9 @@ export function Note({ route }: Props) {
     <View style={styles.container}>
       <View style={styles.header}>
         <View>
-          <Icon name="left" size={24} />
+          <TouchableOpacity activeOpacity={0.6} onPress={() => navigation.goBack()}>
+            <Icon name="left" size={24} />
+          </TouchableOpacity>
         </View>
         <View style={{ flexDirection: 'row' }}>
           {
@@ -101,7 +112,10 @@ export function Note({ route }: Props) {
               :
               <></>
           }
-          <TouchableOpacity activeOpacity={0.6} onPress={() => setNote({ ...note, is_starred: !note.is_starred })}>
+          <TouchableOpacity activeOpacity={0.6} onPress={() => {
+            setHasChanges(true)
+            setNote({ ...note, is_starred: !note.is_starred })
+          }}>
             {
               note.is_starred
                 ?
@@ -110,19 +124,34 @@ export function Note({ route }: Props) {
                 <Icon name="staro" color={theme.palette.light.title} size={24} />
             }
           </TouchableOpacity>
+          {
+            hasChanges
+              ?
+              <TouchableOpacity activeOpacity={0.6} onPress={handleSave}>
+                <Icon name="checkcircleo" size={24} style={{ marginLeft: 10 }} />
+              </TouchableOpacity>
+              :
+              <></>
+          }
         </View>
       </View>
       <TextInput
         style={styles.title}
         placeholder="Título..."
         value={note.title}
-        onChangeText={text => setNote({ ...note, title: text })}
+        onChangeText={text => {
+          setHasChanges(true)
+          setNote({ ...note, title: text })
+        }}
       />
       <TextInput
         style={styles.text}
         placeholder="comece escrevendo alguma coisa :)"
         value={note.content}
-        onChangeText={text => setNote({ ...note, content: text })}
+        onChangeText={text => {
+          setHasChanges(true)
+          setNote({ ...note, content: text })
+        }}
         multiline
       />
     </View>
